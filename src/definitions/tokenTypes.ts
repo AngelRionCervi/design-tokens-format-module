@@ -25,7 +25,7 @@ export namespace Color {
   export type TypeName = typeof colorTypeName;
 
   export type RawValue = {
-    colorSpace: typeof colorSpaceValues[number];
+    colorSpace: (typeof colorSpaceValues)[number];
     components: [number | 'none', number | 'none', number | 'none'];
     alpha?: number;
     hex?: `#${string}`;
@@ -112,7 +112,7 @@ export namespace Number {
    9. Composite Types
    https://tr.designtokens.org/format/#composite-types
 */
-// 9.2 Stroke Style
+// 9.3 Stroke Style
 const strokeStyleTypeName = 'strokeStyle';
 export const strokeStyleStringValues = [
   'solid',
@@ -127,17 +127,18 @@ export const strokeStyleStringValues = [
 export const strokeStyleLineCapValues = ['round', 'butt', 'square'] as const;
 export namespace StrokeStyle {
   export type TypeName = typeof strokeStyleTypeName;
+  export type ObjectValue = {
+    dashArray: Dimension.Value[];
+    lineCap: (typeof strokeStyleLineCapValues)[number];
+  };
   export type RawValue =
     | (typeof strokeStyleStringValues)[number]
-    | {
-        dashArray: Dimension.Value[];
-        lineCap: (typeof strokeStyleLineCapValues)[number];
-      };
+    | StrokeStyle.ObjectValue;
   export type Value = WithAliasValue<StrokeStyle.RawValue>;
   export type Token = TokenSignature<StrokeStyle.TypeName, StrokeStyle.Value>;
 }
 
-// 9.3 Border
+// 9.4 Border
 const borderTypeName = 'border';
 export namespace Border {
   export type TypeName = typeof borderTypeName;
@@ -150,7 +151,7 @@ export namespace Border {
   export type Token = TokenSignature<Border.TypeName, Border.Value>;
 }
 
-// 9.4 Transition
+// 9.5 Transition
 const transitionTypeName = 'transition';
 export namespace Transition {
   export type TypeName = typeof transitionTypeName;
@@ -163,32 +164,24 @@ export namespace Transition {
   export type Token = TokenSignature<Transition.TypeName, Transition.Value>;
 }
 
-// 9.5 Shadow
+// 9.6 Shadow
 const shadowTypeName = 'shadow';
 export namespace Shadow {
   export type TypeName = typeof shadowTypeName;
-  export type RawValue =
-    | Array<{
-        color: Color.Value;
-        offsetX: Dimension.Value;
-        offsetY: Dimension.Value;
-        blur: Dimension.Value;
-        spread: Dimension.Value;
-        inset?: boolean;
-      }>
-    | {
-        color: Color.Value;
-        offsetX: Dimension.Value;
-        offsetY: Dimension.Value;
-        blur: Dimension.Value;
-        spread: Dimension.Value;
-        inset?: boolean;
-      };
+  export type ObjectValue = {
+    color: Color.Value;
+    offsetX: Dimension.Value;
+    offsetY: Dimension.Value;
+    blur: Dimension.Value;
+    spread: Dimension.Value;
+    inset?: boolean;
+  };
+  export type RawValue = Array<Shadow.ObjectValue> | Shadow.ObjectValue;
   export type Value = WithAliasValue<Shadow.RawValue>;
   export type Token = TokenSignature<Shadow.TypeName, Shadow.Value>;
 }
 
-// 9.6 Gradient
+// 9.7 Gradient
 const gradientTypeName = 'gradient';
 export namespace Gradient {
   export type TypeName = typeof gradientTypeName;
@@ -200,7 +193,7 @@ export namespace Gradient {
   export type Token = TokenSignature<Gradient.TypeName, Gradient.Value>;
 }
 
-// 9.7 Typography
+// 9.8 Typography
 const typographyTypeName = 'typography';
 export namespace Typography {
   export type TypeName = typeof typographyTypeName;
