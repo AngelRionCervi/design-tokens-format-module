@@ -1,6 +1,7 @@
 import { colorSpaceValues, Color } from '../definitions/tokenTypes.js';
+import { Result, ValidationError } from './types.js';
 
-interface NamedRange {
+interface NamedRanges {
   [key: string]: [number, number];
 }
 
@@ -8,13 +9,13 @@ interface ColorValues {
   [key: string]: number;
 }
 
-const CSS_VALUE_RANGES = {
+export const CSS_VALUES_RANGES = {
   fontWeight: [0, 1000],
   cubicBezierX: [0, 1],
   gradientPosition: [0, 1],
 } as const;
 
-const COLOR_RANGES: Record<Color.RawValue['colorSpace'], NamedRange> = {
+export const COLOR_SPACES_RANGES: Record<Color.RawValue['colorSpace'], NamedRanges> = {
   srgb: {
     r: [0, 1],
     g: [0, 1],
@@ -89,46 +90,69 @@ const COLOR_RANGES: Record<Color.RawValue['colorSpace'], NamedRange> = {
 
 function checkCssPropertyRange(
   value: number,
-  rangeName: keyof typeof CSS_VALUE_RANGES,
-): boolean {
-  const range = CSS_VALUE_RANGES[rangeName];
+  rangeName: keyof typeof CSS_VALUES_RANGES,
+): Result<true, ValidationError> {
+  const range = CSS_VALUES_RANGES[rangeName];
   if (!range) {
     throw new Error(`Range "${rangeName}" is not defined.`);
   }
-  return value >= range[0] && value <= range[1];
+  const isOk = value >= range[0] && value <= range[1];
+
+  if (!isOk) {
+    return {
+      status: 'error',
+      error: {
+        tag: 'OUT_OF_RANGE',
+        message: `Value ${value} is out of range [${range[0]}, ${range[1]}] for property "${rangeName}".`,
+      },
+    };
+  }
+
+  return { status: 'ok', value: true };
 }
 
 function checkColorComponentRange(
-  colorSpace: keyof typeof COLOR_RANGES,
+  colorSpace: keyof typeof COLOR_SPACES_RANGES,
   values: ColorValues,
-) {
-  const colorRange = COLOR_RANGES[colorSpace];
+): Result<true, ValidationError> {
+  const colorRange = COLOR_SPACES_RANGES[colorSpace];
   if (!colorRange) {
     throw new Error(`Color space "${colorSpace}" is not defined.`);
   }
   for (const [component, componentValue] of Object.entries(values)) {
     const componentRange = colorRange[component];
     if (!componentRange) {
-      throw new Error(
-        `Component "${component}" is not defined for color space "${colorSpace}".`,
-      );
+      return {
+        status: 'error',
+        error: {
+          tag: 'UNDEFINED_COMPONENT',
+          message: `Component "${component}" is not defined for color space "${colorSpace}".`,
+        },
+      };
     }
     if (
       componentValue < componentRange[0] ||
       componentValue >= componentRange[1]
     ) {
-      return false;
+      return {
+        status: 'error',
+        error: {
+          tag: 'OUT_OF_RANGE',
+          message: `Value ${componentValue} for component "${component}" is out of range [${componentRange[0]}, ${componentRange[1]}) for color space "${colorSpace}".`,
+        },
+      };
     }
   }
-  return true;
+
+  return { status: 'ok', value: true };
 }
 
 export function isInRange(
   value: number,
   range:
-    | keyof typeof CSS_VALUE_RANGES
+    | keyof typeof CSS_VALUES_RANGES
     | { colorSpace: (typeof colorSpaceValues)[number]; values: ColorValues },
-): boolean {
+): Result<true, ValidationError> {
   if (typeof range === 'string') {
     return checkCssPropertyRange(value, range);
   } else {

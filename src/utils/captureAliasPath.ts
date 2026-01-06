@@ -3,26 +3,7 @@ import {
   extractAliasPathAsString,
 } from './extractAliasPath.js';
 import { matchIsAliasValue } from './matchIsAliasValue.js';
-
-export const CAPTURE_ALIAS_PATH_ERRORS = [
-  'TYPE_ERROR',
-  'FORMAT_ERROR',
-] as const;
-
-type ValidationError = {
-  tag: (typeof CAPTURE_ALIAS_PATH_ERRORS)[number];
-  message: string;
-};
-
-type Result<T, E> =
-  | {
-      status: 'ok';
-      value: T;
-    }
-  | {
-      status: 'error';
-      error: E;
-    };
+import { Result, ValidationError } from './types.js';
 
 export function captureAliasPath(
   value: unknown,

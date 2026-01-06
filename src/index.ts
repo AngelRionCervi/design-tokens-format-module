@@ -36,10 +36,13 @@ export {
   strokeStyleLineCapValues,
 } from './definitions/tokenTypes.js';
 
+export { captureAliasPath } from './utils/captureAliasPath.js';
+export { CAPTURE_ALIAS_PATH_ERRORS } from './utils/types.js';
 export {
-  captureAliasPath,
-  CAPTURE_ALIAS_PATH_ERRORS,
-} from './utils/captureAliasPath.js';
+  COLOR_SPACES_RANGES,
+  CSS_VALUES_RANGES,
+  isInRange,
+} from './utils/isInRange.js';
 export {
   extractAliasPathAsString,
   extractAliasPathAsArray,
