@@ -249,13 +249,13 @@ type TokenTypeName =
 ### `captureAliasPath` (function)
 
 ```ts
-const CAPTURE_ALIAS_PATH_ERRORS = {
+const UTILS_ERRORS = {
   TYPE_ERROR: 'Expected a string value.',
   // ...
 } as const;
 
 type ValidationError = {
-  [k in keyof Writable<typeof CAPTURE_ALIAS_PATH_ERRORS>]?: {
+  [k in keyof Writable<typeof UTILS_ERRORS>]?: {
     message: string;
   };
 };

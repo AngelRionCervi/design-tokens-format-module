@@ -37,11 +37,12 @@ export {
 } from './definitions/tokenTypes.js';
 
 export { captureAliasPath } from './utils/captureAliasPath.js';
-export { CAPTURE_ALIAS_PATH_ERRORS } from './utils/types.js';
+export { UTILS_ERRORS } from './utils/types.js';
 export {
   COLOR_SPACES_RANGES,
   CSS_VALUES_RANGES,
-  isInRange,
+  isInRangeCSS,
+  isInRangeColorSpace,
 } from './utils/isInRange.js';
 export {
   extractAliasPathAsString,
